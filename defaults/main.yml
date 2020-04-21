@@ -1,0 +1,5 @@
+---
+
+# Auto reboot on the provisioner would fail
+# Production systems may not want inadvertant reboots
+auto_reboot: false
