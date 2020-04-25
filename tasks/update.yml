@@ -1,5 +1,10 @@
 ---
 
+- name: Install epel yum repository
+  yum:
+    name: epel-release
+    state: present
+
 - name: "Start package upgrade, excluding packages requiring a reboot"
   yum:
     name: '*'
@@ -43,14 +48,14 @@
 
 - name: An update that needs a reboot may require a manual reboot
   when:
-    - not auto_reboot
+    - not auto_reboot | bool
     - yum_reboot_update_result.changed
   fail:
     msg: "[REBOOT REQUIRED] New kernel install and auto_reboot is disabled"
     
 - name: An update that needs a reboot requires an automated reboot
   when: 
-    - auto_reboot
+    - auto_reboot | bool
     - yum_reboot_update_result.changed
   reboot:
 
