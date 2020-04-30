@@ -12,39 +12,22 @@
     exclude: kernel*
   # Can an update take as long as an hour?
   async: 3600
-  # Don't wait for async task
-  poll: 0
-  # async job is always changed so ignore
-  changed_when: false
-  register: yum_package_update
-  
-- name: "Wait for yum_package_update async task"
-  async_status:
-    jid: "{{ yum_package_update.ansible_job_id }}"
-  register: yum_package_update_result
-  until: yum_package_update_result.finished
-  retries: 60
-  delay: 60
+  # Poll every 60 seconds to avoid ssh timeout
+  poll: 60
+  # Retry if connection goes down
+  retries: 3
 
-- name: "Start upgrade for packages requiring restart"
+- name: "Start upgrade for packages requiring reboot"
   yum:
     name: 'kernel*'
     state: latest
   # Can an update take as long as an hour?
   async: 3600
-  # Don't wait for async task
-  poll: 0
-  # async job is always changed so ignore
-  changed_when: false
-  register: yum_reboot_update
-  
-- name: "Wait for yum_reboot_update async task"
-  async_status:
-    jid: "{{ yum_reboot_update.ansible_job_id }}"
+  # Poll every 60 seconds to avoid ssh timeout
+  poll: 60
+  # Retry if connection goes down
+  retries: 3
   register: yum_reboot_update_result
-  until: yum_reboot_update_result.finished
-  retries: 60
-  delay: 60
 
 - name: An update that needs a reboot may require a manual reboot
   when:
